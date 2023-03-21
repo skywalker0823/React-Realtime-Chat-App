@@ -59,3 +59,5 @@ export default App;
 
 // 我們可以在home元件中設置狀態來儲存使用者/房間的資料(state)，但chat元件也會需要這些東西
 // 因此我們可以將這些資料放在App元件中，並將它們傳遞給home和chat元件
+
+// npm start

@@ -1,5 +1,6 @@
 // server/index.js
 
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const http = require('http');
@@ -7,12 +8,14 @@ const cors = require('cors');
 const { Server } = require('socket.io');
 const CHAT_BOT = 'ChatBot';
 
+
 let chatRoom = '';
 let allUsers = [];
 
 app.use(cors()); // Add cors middleware
 
 const server = http.createServer(app);
+const harperSaveMessage = require('./services/harper-save-message');
 
 
 // Add socket.io
@@ -62,7 +65,18 @@ io.on('connection', (socket) => {
 
     });
 
-    // Block 2 :Listen to the message event from the client
+
+    // User send message
+    socket.on('send_message', (data) => {
+        const { username, room, message, createdtime } = data;
+        // Send message to the server
+        io.in(room).emit('receive_message', data);// Send to all users in the room, including the sender.
+        // Also save the message to the database
+        harperSaveMessage(message, room ,username, createdtime)
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
+    }
+    );
 
 });
 
@@ -73,3 +87,4 @@ app.get('/', (req, res) => {
 
 server.listen(4000, () => 'Server is running on port 4000');
 
+// npm run dev
