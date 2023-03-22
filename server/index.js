@@ -1,13 +1,12 @@
 // server/index.js
 
-require('dotenv').config();
 const express = require('express');
 const app = express();
 const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const CHAT_BOT = 'ChatBot';
-
+require('dotenv').config();
 
 let chatRoom = '';
 let allUsers = [];
@@ -16,13 +15,15 @@ app.use(cors()); // Add cors middleware
 
 const server = http.createServer(app);
 const harperSaveMessage = require('./services/harper-save-message');
+const harperGetMessages = require('./services/harper-get-messages');
+const leaveRoom = require('./utils/leave_room');
 
 
 // Add socket.io
 const io = new Server(server, {
     cors: {
         //allow cross-origin requests from the client
-        origin: 'http://localhost:3000',
+        origin: '*',
         methods: ['GET', 'POST'],
     },
 });
@@ -63,6 +64,14 @@ io.on('connection', (socket) => {
         socket.to(chatRoom).emit('chatroom_users', chatRoomUsers);
         socket.emit('chatroom_users', chatRoomUsers);
 
+
+        // Get all messages in the room on user join
+        harperGetMessages(room)
+            .then((last100Messages) => {
+                socket.emit('last_100_messages',last100Messages);
+            })
+            .catch((err) => console.log(err));
+
     });
 
 
@@ -78,6 +87,40 @@ io.on('connection', (socket) => {
     }
     );
 
+    // User leave room
+    socket.on('leave_room', (data) => {
+        const { username, room } = data;
+        // Use to broadcast to all users in the room(a message event) that a user has left.
+        // socket.to(room).emit('message', `${username} has left the room`);
+        // Get current time stamp.
+        let __createdtime__ = new Date().toLocaleTimeString();
+
+        allUsers = leaveRoom(socket.id, allUsers);
+        // Use to broadcast to all users in the room(a receive_message event) that a user has left.
+        socket.to(room).emit('chatroom_users',allUsers);
+        socket.to(room).emit('receive_message',{
+            message: `${username} has left the room`,
+            username: CHAT_BOT,
+            createdtime: __createdtime__,
+        });
+        console.log(`${username} has left the room`);
+    });
+
+    // User disconnect
+    socket.on('disconnect', () => {
+        console.log(`a user disconnected ${socket.id}`);
+        const user = allUsers.find((user) => user.id == socket.id);
+        if (user?.username){
+            allUsers = leaveRoom(socket.id, allUsers);
+            socket.to(chatRoom).emit('chatroom_users',allUsers);
+            socket.to(chatRoom).emit('receive_message',{
+                message: `${user.username} has left the room`,
+                username: CHAT_BOT,
+                createdtime: __createdtime__,
+            });
+        }
+    });
+
 });
 
 app.get('/', (req, res) => {
@@ -85,6 +128,9 @@ app.get('/', (req, res) => {
   });
   
 
-server.listen(4000, () => 'Server is running on port 4000');
+// server.listen(4000, () => 'Server is running on port 4000');
+//server listen 0.0.0.0 4000port
+server.listen(process.env.PORT || 4000, '192.168.181.58', () => 'Server is running on port 4000');
+
 
 // npm run dev

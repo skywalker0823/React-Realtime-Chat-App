@@ -1,6 +1,6 @@
 var axios = require('axios');
 
-function harperSaveMessage(message, room, username) {
+function harperSaveMessage(message, room, username,createdtime) {
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
@@ -14,6 +14,7 @@ function harperSaveMessage(message, room, username) {
         message,
         username,
         room,
+        createdtime,
       },
     ],
   });
@@ -23,17 +24,17 @@ function harperSaveMessage(message, room, username) {
     url: dbUrl,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: dbPw,
+      'Authorization': dbPw,
     },
     data: data,
   };
 
   return new Promise((resolve, reject) => {
     axios(config)
-      .then(function (response) {
+      .then((response) => {
         resolve(JSON.stringify(response.data));
       })
-      .catch(function (error) {
+      .catch((error) => {
         reject(error);
       });
   });
