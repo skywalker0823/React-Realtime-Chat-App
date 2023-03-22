@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  client:
+    build: ./client
+    dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+    container_name: client_container
+
+  server:
+    build: ./server
+    dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    container_name: server_container
+
+  

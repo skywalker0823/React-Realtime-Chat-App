@@ -30,7 +30,7 @@ const io = new Server(server, {
 
 // Add socket.io event listener
 io.on('connection', (socket) => {
-    console.log(`a user connected ${socket.id}`);
+    console.log(`a user connected -> ${socket.id}`);
 
 
     // Block 1 :Listen to the message event from the client
@@ -130,7 +130,7 @@ app.get('/', (req, res) => {
 
 // server.listen(4000, () => 'Server is running on port 4000');
 //server listen 0.0.0.0 4000port
-server.listen(process.env.PORT || 4000, '192.168.181.58', () => 'Server is running on port 4000');
+server.listen(process.env.PORT || 4000, '0.0.0.0', () => 'Server is running on port 4000');
 
 
 // npm run dev
