@@ -12,7 +12,7 @@ import io from 'socket.io-client';
 import Chat from './pages/chat';
 
 // 建立socket連線,server端的連線網址為http://localhost:4000
-const socket = io('http://localhost:4000');
+const socket = io('http://192.168.181.58:4000');
 
 
 
