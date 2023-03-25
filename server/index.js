@@ -6,7 +6,7 @@ const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const CHAT_BOT = 'ChatBot';
-require('dotenv').config();
+require('dotenv').config({ path: '../.env'});
 
 let chatRoom = '';
 let allUsers = [];
@@ -25,6 +25,7 @@ const io = new Server(server, {
         //allow cross-origin requests from the client
         origin: '*',
         methods: ['GET', 'POST'],
+        allowedHeaders: ['from-websocket-with-love'],
     },
 });
 
@@ -84,8 +85,7 @@ io.on('connection', (socket) => {
         harperSaveMessage(message, room ,username, createdtime)
         .then((res) => console.log(res))
         .catch((err) => console.log(err));
-    }
-    );
+    });
 
     // User leave room
     socket.on('leave_room', (data) => {
@@ -125,7 +125,7 @@ io.on('connection', (socket) => {
 
 app.get('/', (req, res) => {
     res.send('This is the server side page, please go port 3000.');
-  });
+});
   
 
 // server.listen(4000, () => 'Server is running on port 4000');

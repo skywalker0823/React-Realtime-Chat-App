@@ -11,8 +11,24 @@ import io from 'socket.io-client';
 // 引入Chat元件
 import Chat from './pages/chat';
 
+// method 0: from the same domain as the client
+//get url exclude port
+const current_url = window.location.protocol + '//' + window.location.hostname;
+const port = process.env.PORT || 4000;
+const socket = io(current_url + ':' + port,{
+  extraHeaders:{
+    "from-websocket-with-love": true
+  }
+});
+
 // 建立socket連線,server端的連線網址為http://localhost:4000
-const socket = io('http://192.168.181.58:4000');
+// const socket = io('http://192.168.181.58:4000');
+
+// method 2: Use window.location.origin to get the origin of the current page.
+// const socket = io(window.location.origin);
+
+//method 3 : DNS over HTTPS
+
 
 
 

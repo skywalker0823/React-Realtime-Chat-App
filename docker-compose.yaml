@@ -3,18 +3,28 @@ version: '3'
 services:
   client:
     build: ./client
-    dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
       - server
+    restart: on-failure:5
     container_name: client_container
 
   server:
     build: ./server
-    dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
       - "4000:4000"
+    restart: on-failure:5
     container_name: server_container
 
-  
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - client
+      - server
+    restart: on-failure:5
+    container_name: nginx_container
