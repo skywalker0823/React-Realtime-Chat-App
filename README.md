@@ -3,4 +3,12 @@
 - React(Create-React-App)
 - Nodejs(Express)
 - Socket.io
-- Firebase
+- HarperDB
+
+- Firebase (Building)
+
+## How to run
+- Clone the repo
+- put DB_URL and DB_KEY in .env file at root directory
+- docker-compose up --build -d
+- It's done
